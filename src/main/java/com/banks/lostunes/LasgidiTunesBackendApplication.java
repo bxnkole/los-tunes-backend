@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,13 +42,13 @@ public class LasgidiTunesBackendApplication {
 
                     AppUser adminAppUser = new AppUser();
                     adminAppUser.setUsername("admin");
-                    adminAppUser.setPassword("admin");
+                    adminAppUser.setPassword(new BCryptPasswordEncoder().encode("admin"));
                     adminAppUser.setRoles(new HashSet<>(Arrays.asList(adminRole)));
                     appUserRepo.save(adminAppUser);
 
                     AppUser userAppUser = new AppUser();
                     userAppUser.setUsername("user");
-                    userAppUser.setPassword("user");
+                    userAppUser.setPassword(new BCryptPasswordEncoder().encode("user"));
                     userAppUser.setRoles(new HashSet<>(Arrays.asList(userRole)));
                     appUserRepo.save(userAppUser);
                 }

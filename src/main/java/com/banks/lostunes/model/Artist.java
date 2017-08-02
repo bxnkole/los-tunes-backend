@@ -17,6 +17,7 @@ import java.util.Set;
 @Entity
 public class Artist extends BaseEntity {
     private String name;
+    private String code;
 
     @OneToMany
     private Set<Album> albums;
