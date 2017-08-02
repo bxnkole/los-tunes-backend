@@ -7,15 +7,16 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -26,11 +27,11 @@ import java.util.stream.Collectors;
  * Created by banks on 8/1/17.
  */
 @Component
-public class JwtUtil {
-
-    private final Logger log = LoggerFactory.getLogger(JwtUtil.class);
+@Log4j
+public class TokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
+    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     private String secretKey = "LeoMessi";
 
@@ -39,7 +40,7 @@ public class JwtUtil {
     private long tokenValidityInMillisecondsForRememberMe = 10000;
 
 
-    public String createToken(Authentication authentication, Boolean rememberMe) {
+    public String generateToken(Authentication authentication, Boolean rememberMe) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
@@ -95,5 +96,13 @@ public class JwtUtil {
             log.trace("JWT token compact of handler are invalid trace: {}", e);
         }
         return false;
+    }
+
+    public String getTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7, bearerToken.length());
+        }
+        return null;
     }
 }
